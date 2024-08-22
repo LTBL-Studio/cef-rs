@@ -4,7 +4,7 @@ use std::{
     mem::size_of,
     ptr::*,
 };
-use winit::{event_loop::EventLoop, platform::x11::WindowExtX11, window::Window};
+// use winit::{event_loop::EventLoop, window::Window};
 
 fn main() {
     unsafe {
@@ -68,10 +68,12 @@ fn main() {
             cookieable_schemes_list: cef_string_t::default(),
             cookieable_schemes_exclude_defaults: 0,
             log_items: cef_log_items_t::LOG_ITEMS_NONE,
+            chrome_policy_id: cef_string_t::default(),
+            chrome_app_icon_id: 0,
         };
         dbg!(cef_initialize(&arg, &settings, &mut app, null_mut()));
 
-        let el = EventLoop::new();
+        // let el = EventLoop::new();
         // let window = Window::new(&el).unwrap();
         // let xid = window.xlib_window().unwrap();
         // dbg!(xid);
@@ -132,8 +134,8 @@ fn main() {
             databases: cef_state_t::STATE_DEFAULT,
             webgl: cef_state_t::STATE_DEFAULT,
             background_color: 0,
-            accept_language_list: cef_string_t::default(),
             chrome_status_bubble: cef_state_t::STATE_DEFAULT,
+            chrome_zoom_bubble: cef_state_t::STATE_DEFAULT,
         };
 
         let mut client = cef_client_t {
