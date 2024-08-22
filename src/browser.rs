@@ -80,7 +80,7 @@ impl BrowserSettings {
         Self::default()
     }
 
-    pub fn get_raw(self) -> cef_browser_settings_t {
+    pub fn into_raw(self) -> cef_browser_settings_t {
         cef_browser_settings_t {
             size: std::mem::size_of::<cef_browser_settings_t>(),
             windowless_frame_rate: self.windowless_frame_rate as c_int,
@@ -125,10 +125,10 @@ pub fn create_browser<T: Client>(
 
     unsafe {
         cef_browser_host_create_browser(
-            &window_info.get_raw(),
+            &window_info.into_raw(),
             client,
             &url.get_raw(),
-            &settings.get_raw(),
+            &settings.into_raw(),
             null_mut(),
             null_mut(),
         )
@@ -160,7 +160,7 @@ pub fn create_browser_view<T: Client>(
         cef_browser_view_create(
             client,
             &url.get_raw(),
-            &settings.get_raw(),
+            &settings.into_raw(),
             null_mut(),
             null_mut(),
             null_mut(),

@@ -49,7 +49,7 @@ impl WindowInfo {
         Self::default()
     }
 
-    pub fn get_raw(self) -> cef_window_info_t {
+    pub fn into_raw(self) -> cef_window_info_t {
         cef_window_info_t {
             window_name: self.window_name.get_raw(),
             bounds: self.bounds,
