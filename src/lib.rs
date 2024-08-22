@@ -79,6 +79,7 @@ But please understand that some requests might result into not planned.
 mod app;
 pub mod args;
 mod browser;
+pub mod render_utils;
 pub mod client;
 mod command_line;
 mod panel;
@@ -100,5 +101,4 @@ pub use window::*;
 
 pub type LogSeverity = cef_sys::cef_log_severity_t;
 pub type LogItems = cef_sys::cef_log_items_t;
-pub type Rect = cef_sys::cef_rect_t;
 pub type State = cef_sys::cef_state_t;

@@ -5,18 +5,14 @@ use cef_sys::{
 };
 
 use crate::{
-    add_view_delegate_methods,
-    panel::{Panel, PanelDelegate},
-    rc::{RcImpl, RefGuard},
-    string::CefString,
-    wrapper, Rect,
+    add_view_delegate_methods, render_utils::CefRect, panel::{Panel, PanelDelegate}, rc::{RcImpl, RefGuard}, string::CefString, wrapper
 };
 
 /// See [cef_window_info_t] for more documentation.
 #[derive(Debug, Clone)]
 pub struct WindowInfo {
     pub window_name: CefString,
-    pub bounds: Rect,
+    pub bounds: CefRect,
     // TODO: raw_window_handle
     pub parent_window: u64,
     pub windowless_rendering_enabled: bool,
@@ -29,7 +25,7 @@ impl Default for WindowInfo {
     fn default() -> Self {
         Self {
             window_name: CefString::new("UwU"),
-            bounds: Rect {
+            bounds: CefRect {
                 x: 0,
                 y: 0,
                 width: 1280,
@@ -52,7 +48,7 @@ impl WindowInfo {
     pub fn into_raw(self) -> cef_window_info_t {
         cef_window_info_t {
             window_name: self.window_name.get_raw(),
-            bounds: self.bounds,
+            bounds: self.bounds.into_raw(),
             parent_window: self.parent_window as c_ulong,
             windowless_rendering_enabled: self.windowless_rendering_enabled as c_int,
             shared_texture_enabled: self.shared_texture_enabled as c_int,
@@ -88,7 +84,7 @@ pub trait WindowDelegate: PanelDelegate {
     fn into_raw(self) -> *mut cef_window_delegate_t {
         let mut object: cef_window_delegate_t = unsafe { std::mem::zeroed() };
 
-        // Panal delegate doesn't have any methods. So we skip to view.
+        // Panel delegate doesn't have any methods. So we skip to view.
         let view = &mut object.base.base;
         add_view_delegate_methods!(view);
 
