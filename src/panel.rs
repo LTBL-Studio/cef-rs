@@ -2,7 +2,7 @@ use cef_sys::{cef_panel_delegate_t, cef_panel_t};
 
 use crate::{
     add_view_delegate_methods,
-    rc::{RcImpl, RefGuard},
+    rc::RcImpl,
     view::View,
     wrapper, ViewDelegate, Window,
 };

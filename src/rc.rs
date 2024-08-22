@@ -153,15 +153,15 @@ macro_rules! wrapper {
     $(->$value:ty)?;)*
     ) => {
         $(#[$attr])*
-        pub struct $name(pub(crate) crate::rc::RefGuard<$sys>);
+        pub struct $name(pub(crate) $crate::rc::RefGuard<$sys>);
 
-        impl crate::rc::Rc for $sys {
+        impl $crate::rc::Rc for $sys {
             fn as_base(&self) -> &cef_sys::cef_base_ref_counted_t {
                 &self.base.as_base()
             }
         }
 
-        impl crate::rc::Rc for $name {
+        impl $crate::rc::Rc for $name {
             fn as_base(&self) -> &cef_sys::cef_base_ref_counted_t {
                 self.0.as_base()
             }
@@ -169,14 +169,14 @@ macro_rules! wrapper {
 
         impl $name {
             pub unsafe fn from_raw(ptr: *mut $sys) -> Self {
-                Self(RefGuard::from_raw(ptr))
+                Self($crate::rc::RefGuard::from_raw(ptr))
             }
 
             pub unsafe fn into_raw(self) -> *mut $sys {
                 self.0.into_raw()
             }
 
-            $(crate::gen_fn!($visibility fn $method(
+            $($crate::gen_fn!($visibility fn $method(
                 $($arg: $ref $type)*
             )$(-> $value)?);)*
         }

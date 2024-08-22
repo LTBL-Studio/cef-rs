@@ -12,6 +12,7 @@ use cef_sys::{
     cef_string_list_t, cef_string_map_t, cef_string_userfree_utf16_t, cef_string_utf16_t,
 };
 use std::collections::HashMap;
+use std::fmt::Display;
 use std::ptr::null_mut;
 use widestring::U16CString;
 
@@ -26,23 +27,23 @@ impl CefString {
 
     /// Create a `CefString` from raw `cef_string_utf16_t` pointer. If the pointer is null or it fails
     /// to convert to `U16CString`, this method will returns `None`.
-    pub fn from_raw(ptr: *const cef_string_utf16_t) -> Option<CefString> {
+    pub unsafe fn from_raw(ptr: *const cef_string_utf16_t) -> Option<CefString> {
         if ptr.is_null() {
-            return None;
+            None
         } else {
             // It's a smart pointer, so cef retains ownership and will call the dtor
             unsafe {
                 U16CString::from_ptr((*ptr).str_, (*ptr).length)
                     .ok()
-                    .map(|x| CefString(x))
+                    .map(CefString)
             }
         }
     }
 
     /// Create a `CefString` from raw `cef_string_userfree_utf16_t` pointer. If the pointer is null or it fails
     /// to convert to `U16CString`, this method will returns `None`.
-    pub fn from_userfree_cef(ptr: cef_string_userfree_utf16_t) -> Option<CefString> {
-        let res = Self::from_raw(ptr);
+    pub unsafe fn from_userfree_cef(ptr: cef_string_userfree_utf16_t) -> Option<CefString> {
+        let res = unsafe { Self::from_raw(ptr) };
         unsafe {
             cef_sys::cef_string_userfree_utf16_free(ptr);
         }
@@ -60,9 +61,9 @@ impl CefString {
     }
 }
 
-impl ToString for CefString {
-    fn to_string(&self) -> String {
-        self.0.to_string_lossy()
+impl Display for CefString {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.display().fmt(f)
     }
 }
 
@@ -72,7 +73,7 @@ pub unsafe fn parse_string_list(ptr: cef_string_list_t) -> Vec<String> {
     for i in 0..count {
         let value = null_mut();
         if cef_sys::cef_string_list_value(ptr, i, value) > 0 {
-            CefString::from_raw(value).map(|v| res.push(v.to_string()));
+            if let Some(v) = CefString::from_raw(value) { res.push(v.to_string()) }
         }
     }
     res

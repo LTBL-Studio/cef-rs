@@ -15,10 +15,10 @@ wrapper!(
 
 impl View {
     pub fn as_browser_view(&self) -> Option<BrowserView> {
-        let r = self.0.as_browser_view.map(|f| {
-            let p = unsafe { f(self.0.get_raw()) };
-            p
-        });
+        let r = self
+            .0
+            .as_browser_view
+            .map(|f| unsafe { f(self.0.get_raw()) });
 
         r.filter(|p| p.is_null())
             .map(|p| BrowserView(unsafe { RefGuard::from_raw(p) }))
@@ -27,7 +27,7 @@ impl View {
     pub fn as_panel(&self) -> Option<Panel> {
         self.0
             .as_panel
-            .map(|f| {
+            .and_then(|f| {
                 let p = unsafe { f(self.0.get_raw()) };
                 if p.is_null() {
                     None
@@ -35,7 +35,6 @@ impl View {
                     Some(Panel(unsafe { RefGuard::from_raw(p) }))
                 }
             })
-            .flatten()
     }
 }
 
@@ -54,7 +53,7 @@ pub trait ViewDelegate: Sized {
     }
 }
 
-/// View delegate could be otehr types' base. Use this macro to add view methods for them.
+/// View delegate could be other types' base. Use this macro to add view methods for them.
 macro_rules! add_view_delegate_methods {
     ($name:ident) => {
         use crate::view::*;
