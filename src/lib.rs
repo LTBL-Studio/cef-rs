@@ -81,6 +81,7 @@ pub mod args;
 mod browser;
 pub mod render_utils;
 pub mod load_handler;
+pub mod life_span_handler;
 pub mod client;
 mod command_line;
 mod panel;
