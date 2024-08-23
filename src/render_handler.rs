@@ -7,7 +7,12 @@ use cef_sys::{
 };
 
 use crate::{
-    rc::RcImpl, render_utils::{CefAcceleratedPaintInfo, CefPoint, CefRange, CefRect, CefScreenInfo, PaintElementType}, string::CefString, Browser, DragOperationsMask, TextInputMode
+    rc::RcImpl,
+    render_utils::{
+        CefAcceleratedPaintInfo, CefPoint, CefRange, CefRect, CefScreenInfo, PaintElementType,
+    },
+    string::CefString,
+    Browser, DragOperationsMask, TextInputMode,
 };
 
 /// See [cef_render_handler_t] for more documentation.
@@ -18,19 +23,14 @@ pub trait RenderHandler: Sized {
     }
     fn get_view_rect(&self, browser: &Browser) -> CefRect;
     fn get_screen_point(&self, _browser: &Browser, _view: CefPoint) -> Option<CefPoint> {
-        println!("get_screen_point");
         None
     }
     fn get_screen_info(&self, _browser: &Browser, _screen_info: CefScreenInfo) -> bool {
         false
     }
     //get_screen_info:
-    fn on_popup_show(&self, _browser: &Browser, _show: bool) {
-        panic!()
-    }
-    fn on_popup_size(&self, _browser: &Browser, _rect: CefRect) {
-        panic!()
-    }
+    fn on_popup_show(&self, _browser: &Browser, _show: bool) {}
+    fn on_popup_size(&self, _browser: &Browser, _rect: CefRect) {}
     fn on_paint(
         &self,
         _browser: &Browser,
@@ -40,7 +40,6 @@ pub trait RenderHandler: Sized {
         _width: i32,
         _height: i32,
     ) {
-        println!("on_paint");
     }
     fn on_accelerated_paint(
         &self,
@@ -49,21 +48,15 @@ pub trait RenderHandler: Sized {
         _dirty_rects: &[CefRect],
         _info: CefAcceleratedPaintInfo,
     ) {
-        println!("on_accelerated_paint");
     }
-    fn update_drag_cursor(&self, _browser: &Browser, _operation: DragOperationsMask) {
-        panic!()
-    }
-    fn on_scroll_offset_changed(&self, _browser: &Browser, _x: f64, _y: f64) {
-        panic!()
-    }
+    fn update_drag_cursor(&self, _browser: &Browser, _operation: DragOperationsMask) {}
+    fn on_scroll_offset_changed(&self, _browser: &Browser, _x: f64, _y: f64) {}
     fn on_ime_composition_range_changed(
         &self,
         _browser: &Browser,
         _selected_range: CefRange,
         _character_bounds: &[CefRect],
     ) {
-        panic!()
     }
     fn on_text_selection_changed(
         &self,
@@ -71,11 +64,8 @@ pub trait RenderHandler: Sized {
         _selected_text: String,
         _selected_range: CefRange,
     ) {
-        panic!()
     }
-    fn on_virtual_keyboard_requested(&self, _browser: &Browser, _input_mode: TextInputMode) {
-        println!("{:?}", _input_mode);
-    }
+    fn on_virtual_keyboard_requested(&self, _browser: &Browser, _input_mode: TextInputMode) {}
 
     fn get_raw(&self) -> *mut cef_render_handler_t {
         let mut object: cef_render_handler_t = unsafe { std::mem::zeroed() };
@@ -124,7 +114,6 @@ extern "C" fn get_root_screen_rect<R: RenderHandler>(
 ) -> ::std::os::raw::c_int {
     let client: &mut RcImpl<_, R> = RcImpl::get(this);
     let browser = unsafe { Browser::from_raw(browser) };
-    println!("Is root screen rect null ? {}", rect.is_null());
 
     if let Some(res) = client.interface.get_root_screen_rect(&browser) {
         if !rect.is_null() {
@@ -134,8 +123,6 @@ extern "C" fn get_root_screen_rect<R: RenderHandler>(
                 (*rect).width = res.width as i32;
                 (*rect).height = res.height as i32;
             }
-        unsafe{println!("{:?}", *rect);}
-
         }
         1
     } else {
@@ -150,7 +137,6 @@ extern "C" fn get_view_rect<R: RenderHandler>(
     let client: &mut RcImpl<_, R> = RcImpl::get(this);
     let browser = unsafe { Browser::from_raw(browser) };
     let res = client.interface.get_view_rect(&browser);
-    println!("Is view rect null ? {}", rect.is_null());
     if !rect.is_null() {
         unsafe {
             (*rect).x = res.x;
@@ -158,8 +144,6 @@ extern "C" fn get_view_rect<R: RenderHandler>(
             (*rect).width = res.width as i32;
             (*rect).height = res.height as i32;
         }
-
-        unsafe{println!("{:?}", *rect);}
     }
 }
 extern "C" fn get_screen_point<R: RenderHandler>(
@@ -196,7 +180,10 @@ extern "C" fn get_screen_info<R: RenderHandler>(
 ) -> ::std::os::raw::c_int {
     let client: &mut RcImpl<_, R> = RcImpl::get(this);
     let browser = unsafe { Browser::from_raw(browser) };
-    client.interface.get_screen_info(&browser, CefScreenInfo::from_mut_ptr(screen_info)).into()
+    client
+        .interface
+        .get_screen_info(&browser, CefScreenInfo::from_mut_ptr(screen_info))
+        .into()
 }
 
 extern "C" fn on_popup_show<R: RenderHandler>(
@@ -230,7 +217,6 @@ extern "C" fn on_paint<R: RenderHandler>(
     width: ::std::os::raw::c_int,
     height: ::std::os::raw::c_int,
 ) {
-    println!("On paint called");
     let client: &mut RcImpl<_, R> = RcImpl::get(this);
     let browser = unsafe { Browser::from_raw(browser) };
     let dirty_rects = CefRect::from_array(dirty_rects_count, dirty_rects);
@@ -250,8 +236,6 @@ extern "C" fn on_accelerated_paint<R: RenderHandler>(
     dirty_rects: *const cef_rect_t,
     info: *const cef_accelerated_paint_info_t,
 ) {
-    println!("On accelerated paint called");
-
     let client: &mut RcImpl<_, R> = RcImpl::get(this);
     let browser = unsafe { Browser::from_raw(browser) };
     let dirty_rects = CefRect::from_array(dirty_rects_count, dirty_rects);
