@@ -1,6 +1,5 @@
 use cef_sys::{
-    cef_app_t, cef_command_line_t, cef_execute_process, cef_initialize, cef_quit_message_loop,
-    cef_run_message_loop, cef_shutdown, cef_string_t,
+    cef_app_t, cef_command_line_t, cef_do_message_loop_work, cef_execute_process, cef_initialize, cef_quit_message_loop, cef_run_message_loop, cef_shutdown, cef_string_t
 };
 
 use crate::{
@@ -51,6 +50,11 @@ pub fn run_message_loop() {
     unsafe { cef_run_message_loop() }
 }
 
+/// See [cef_do_message_loop_work] for more documentation.
+pub fn do_message_loop_work() {
+    unsafe { cef_do_message_loop_work() }
+}
+
 /// See [cef_quit_message_loop] for more documentation.
 pub fn quit_message_loop() {
     unsafe { cef_quit_message_loop() }
@@ -67,7 +71,7 @@ extern "C" fn on_before_command_line_processing<I: App>(
     command_line: *mut cef_command_line_t,
 ) {
     let obj: &mut RcImpl<_, I> = RcImpl::get(this);
-    let process_type = CefString::from_raw(process_type);
+    let process_type = unsafe { CefString::from_raw(process_type).ok() };
     let cmd = unsafe { CommandLine::from_raw(command_line) };
 
     obj.interface
