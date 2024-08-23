@@ -84,6 +84,7 @@ pub mod client;
 mod command_line;
 mod panel;
 pub mod rc;
+pub mod thread;
 mod settings;
 pub mod string;
 mod view;
