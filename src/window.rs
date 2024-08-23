@@ -45,6 +45,10 @@ impl WindowInfo {
         Self::default()
     }
 
+    pub(crate) fn from_mut_ptr(raw: *mut cef_window_info_t) -> Self {
+        Self::from(unsafe { &*raw })
+    }
+    
     pub fn into_raw(self) -> cef_window_info_t {
         cef_window_info_t {
             window_name: self.window_name.get_raw(),
@@ -57,6 +61,21 @@ impl WindowInfo {
         }
     }
 }
+
+impl From<&cef_window_info_t> for WindowInfo {
+    fn from(raw: &cef_window_info_t) -> Self {
+        WindowInfo {
+            window_name: raw.window_name.try_into().expect("Issue converting window_name string"),
+            bounds: raw.bounds.into(),
+            parent_window: raw.parent_window as u64,
+            windowless_rendering_enabled: raw.windowless_rendering_enabled > 0,
+            shared_texture_enabled: raw.shared_texture_enabled > 0,
+            external_begin_frame_enabled: raw.external_begin_frame_enabled > 0,
+            window: raw.window as u64,
+        }
+    }
+}
+
 
 wrapper!(
     #[doc = "See [cef_window_t] for more documentation."]
