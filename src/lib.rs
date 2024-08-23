@@ -80,6 +80,7 @@ mod app;
 pub mod args;
 mod browser;
 pub mod render_utils;
+pub mod load_handler;
 pub mod client;
 mod command_line;
 mod panel;
@@ -100,6 +101,8 @@ pub use settings::*;
 pub use view::*;
 pub use window::*;
 
+pub type ErrorCode = cef_sys::cef_errorcode_t;
+pub type TransitionType = cef_sys::cef_transition_type_t;
 pub type LogSeverity = cef_sys::cef_log_severity_t;
 pub type LogItems = cef_sys::cef_log_items_t;
 pub type State = cef_sys::cef_state_t;
