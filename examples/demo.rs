@@ -11,7 +11,11 @@ impl App for Application {}
 #[derive(Debug)]
 struct DemoClient;
 
-impl Client for DemoClient {}
+impl Client for DemoClient {
+    type RenderHandler = ();
+    type LoadHandler = ();
+    type LifeSpanHandler = ();
+}
 
 #[derive(Debug)]
 struct DemoWindow {
@@ -19,7 +23,7 @@ struct DemoWindow {
 }
 
 impl ViewDelegate for DemoWindow {
-    fn on_child_view_changed(&self, view: cef::View, _added: bool, _child: cef::View) {
+    fn on_child_view_changed(&self, _view: cef::View, _added: bool, _child: cef::View) {
         // view.as_panel().map(|x| x.as_window().map(|w| w.close()));
     }
 }
@@ -41,12 +45,12 @@ fn main() {
     let args = Args::new(std::env::args());
     // dbg!(&args);
     let app = Application;
-    let settings = Settings::new();
+    let settings = Settings::default();
     dbg!(cef::initialize(&args, &settings, Some(app)));
     dbg!(cef::execute_process(&args, Some(app)));
 
     // let window_info = WindowInfo::new();
-    let browser_settings = BrowserSettings::new();
+    let browser_settings = BrowserSettings::default();
     let client = DemoClient;
     let url = CefString::new("https://www.google.com");
 
@@ -55,9 +59,10 @@ fn main() {
         url,
         browser_settings
     ));
-    let delegate = DemoWindow { browser_view };
 
+    let delegate = DemoWindow { browser_view };
     let x = dbg!(cef::create_top_level_window(delegate));
+
     // dbg!(cef::create_browser(
     //     window_info,
     //     Some(client),
