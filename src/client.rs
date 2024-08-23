@@ -1,4 +1,4 @@
-use std::ptr::null_mut;
+use std::{ptr::null_mut, sync::Arc};
 
 use cef_sys::{cef_client_t, cef_life_span_handler_t, cef_load_handler_t, cef_render_handler_t};
 
@@ -10,15 +10,15 @@ pub trait Client: Sized {
     type LoadHandler: LoadHandler;
     type LifeSpanHandler: LifeSpanHandler;
 
-    fn get_render_handler(&self) -> Option<std::cell::Ref<Self::RenderHandler>> {
+    fn get_render_handler(&self) -> Option<Arc<Self::RenderHandler>> {
         None
     }
 
-    fn get_load_handler(&self) -> Option<std::cell::Ref<Self::LoadHandler>> {
+    fn get_load_handler(&self) -> Option<Arc<Self::LoadHandler>> {
         None
     }
 
-    fn get_life_span_handler(&self) -> Option<std::cell::Ref<Self::LifeSpanHandler>> {
+    fn get_life_span_handler(&self) -> Option<Arc<Self::LifeSpanHandler>> {
         None
     }
 

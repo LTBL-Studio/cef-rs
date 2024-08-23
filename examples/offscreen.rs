@@ -1,4 +1,4 @@
-use std::{cell::RefCell, path::Path, thread::sleep, time::Duration};
+use std::{path::Path, sync::Arc, thread::sleep, time::Duration};
 
 use cef::{
     args::Args, client::Client, life_span_handler::LifeSpanHandler, load_handler::LoadHandler, render_handler::RenderHandler, render_utils::{CefRect, PaintElementType}, string::CefString, thread::{currently_on, post_task, Task, ThreadId}, App, Browser, BrowserSettings, LogSeverity, Settings, WindowInfo
@@ -159,9 +159,9 @@ impl RenderHandler for DemoRenderHandler {
 
 #[derive(Debug)]
 struct DemoClient {
-    render_handler: RefCell<DemoRenderHandler>,
-    load_handler: RefCell<DemoLoadHandler>,
-    life_span_handler: RefCell<DemoLifeSpanHandler>,
+    render_handler: Arc<DemoRenderHandler>,
+    load_handler: Arc<DemoLoadHandler>,
+    life_span_handler: Arc<DemoLifeSpanHandler>,
 }
 
 impl Client for DemoClient {
@@ -169,22 +169,16 @@ impl Client for DemoClient {
     type LoadHandler = DemoLoadHandler;
     type LifeSpanHandler = DemoLifeSpanHandler;
 
-    fn get_render_handler(&self) -> Option<std::cell::Ref<DemoRenderHandler>> {
-        let handler: std::cell::Ref<DemoRenderHandler> = self.render_handler.borrow();
-
-        Some(handler)
+    fn get_render_handler(&self) -> Option<Arc<DemoRenderHandler>> {
+        Some(self.render_handler.clone())
     }
 
-    fn get_load_handler(&self) -> Option<std::cell::Ref<DemoLoadHandler>> {
-        let handler: std::cell::Ref<DemoLoadHandler> = self.load_handler.borrow();
-
-        Some(handler)
+    fn get_load_handler(&self) -> Option<Arc<DemoLoadHandler>> {
+        Some(self.load_handler.clone())
     }
 
-    fn get_life_span_handler(&self) -> Option<std::cell::Ref<DemoLifeSpanHandler>> {
-        let handler: std::cell::Ref<DemoLifeSpanHandler> = self.life_span_handler.borrow();
-
-        Some(handler)
+    fn get_life_span_handler(&self) -> Option<Arc<DemoLifeSpanHandler>> {
+        Some(self.life_span_handler.clone())
     }
 }
 
@@ -199,9 +193,9 @@ impl Task for BrowserTask {
         };
         
         let client = DemoClient {
-            render_handler: RefCell::new(DemoRenderHandler),
-            load_handler: RefCell::new(DemoLoadHandler),
-            life_span_handler: RefCell::new(DemoLifeSpanHandler),
+            render_handler: Arc::new(DemoRenderHandler),
+            load_handler: Arc::new(DemoLoadHandler),
+            life_span_handler: Arc::new(DemoLifeSpanHandler),
         };
 
         println!("Client created");
