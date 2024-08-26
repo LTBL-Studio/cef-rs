@@ -33,7 +33,7 @@ impl CefString {
     }
 
     /// Create a `CefString` from raw `cef_string_utf16_t` pointer. If the pointer is null or it fails
-    /// to convert to `U16CString`, this method will returns `None`.
+    /// to convert to `U16CString`, this method will returns a [CefStringError].
     pub unsafe fn from_raw(ptr: *const cef_string_utf16_t) -> Result<CefString, CefStringError> {
         if ptr.is_null() {
             Err(CefStringError::NullPointer)
@@ -47,7 +47,7 @@ impl CefString {
     }
 
     /// Create a `CefString` from raw `cef_string_userfree_utf16_t` pointer. If the pointer is null or it fails
-    /// to convert to `U16CString`, this method will returns `None`.
+    /// to convert to `U16CString`, this method will returns a [CefStringError].
     pub unsafe fn from_userfree_cef(ptr: cef_string_userfree_utf16_t) -> Result<CefString, CefStringError> {
         let res = unsafe { Self::from_raw(ptr) };
         unsafe {
