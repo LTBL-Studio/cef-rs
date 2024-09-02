@@ -141,8 +141,8 @@ impl RenderHandler for DemoRenderHandler {
         _type_: PaintElementType,
         _dirty_rects: &[cef::render_utils::CefRect],
         _bytes: &[u8],
-        _width: i32,
-        _height: i32,
+        _width: u32,
+        _height: u32,
     ) {
         println!("Paint event !");
 

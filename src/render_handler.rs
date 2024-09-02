@@ -37,8 +37,8 @@ pub trait RenderHandler: Sized {
         _type_: PaintElementType,
         _dirty_rects: &[CefRect],
         _bytes: &[u8],
-        _width: i32,
-        _height: i32,
+        _width: u32,
+        _height: u32,
     ) {
     }
     fn on_accelerated_paint(
@@ -225,7 +225,7 @@ extern "C" fn on_paint<R: RenderHandler>(
 
     client
         .interface
-        .on_paint(&browser, type_, &dirty_rects, bytes, width, height);
+        .on_paint(&browser, type_, &dirty_rects, bytes, width as u32, height as u32);
 }
 
 extern "C" fn on_accelerated_paint<R: RenderHandler>(
