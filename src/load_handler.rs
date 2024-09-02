@@ -3,7 +3,7 @@ use cef_sys::{
     cef_transition_type_t,
 };
 
-use crate::{rc::RcImpl, string::CefString, Browser, ErrorCode, TransitionType};
+use crate::{frame::Frame, rc::RcImpl, string::CefString, Browser, ErrorCode, TransitionType};
 
 /// See [cef_load_handler_t] for more documentation.
 pub trait LoadHandler: Sized {
@@ -18,14 +18,14 @@ pub trait LoadHandler: Sized {
     fn on_load_start(
         &self,
         browser: &Browser,
-        frame: *mut cef_frame_t,
+        frame: &mut Frame,
         transition_type: TransitionType,
     );
-    fn on_load_end(&self, browser: &Browser, frame: *mut cef_frame_t, http_status_code: i32);
+    fn on_load_end(&self, browser: &Browser, frame: &mut Frame, http_status_code: i32);
     fn on_load_error(
         &self,
         browser: &Browser,
-        frame: *mut cef_frame_t,
+        frame: &mut Frame,
         error_code: ErrorCode,
         error_text: CefString,
         failed_url: CefString,
@@ -56,17 +56,17 @@ impl LoadHandler for () {
     fn on_load_start(
         &self,
         _browser: &Browser,
-        _frame: *mut cef_frame_t,
+        _frame: &mut Frame,
         _transition_type: TransitionType,
     ) {
     }
 
-    fn on_load_end(&self, _browser: &Browser, _frame: *mut cef_frame_t, _http_status_code: i32) {}
+    fn on_load_end(&self, _browser: &Browser, _frame: &mut Frame, _http_status_code: i32) {}
 
     fn on_load_error(
         &self,
         _browser: &Browser,
-        _frame: *mut cef_frame_t,
+        _frame: &mut Frame,
         _error_code: ErrorCode,
         _error_text: CefString,
         _failed_url: CefString,
@@ -99,9 +99,10 @@ extern "C" fn on_load_start<L: LoadHandler>(
 ) {
     let client: &mut RcImpl<_, L> = RcImpl::get(this);
     let browser = unsafe { Browser::from_raw(browser) };
+    let mut frame = unsafe { Frame::from_raw(frame) };
     client
         .interface
-        .on_load_start(&browser, frame, transition_type);
+        .on_load_start(&browser, &mut frame, transition_type);
 }
 
 extern "C" fn on_load_end<L: LoadHandler>(
@@ -112,9 +113,10 @@ extern "C" fn on_load_end<L: LoadHandler>(
 ) {
     let client: &mut RcImpl<_, L> = RcImpl::get(this);
     let browser = unsafe { Browser::from_raw(browser) };
+    let mut frame = unsafe { Frame::from_raw(frame) };
     client
         .interface
-        .on_load_end(&browser, frame, http_status_code);
+        .on_load_end(&browser, &mut frame, http_status_code);
 }
 
 extern "C" fn on_load_error<L: LoadHandler>(
@@ -127,9 +129,10 @@ extern "C" fn on_load_error<L: LoadHandler>(
 ) {
     let client: &mut RcImpl<_, L> = RcImpl::get(this);
     let browser = unsafe { Browser::from_raw(browser) };
+    let mut frame = unsafe { Frame::from_raw(frame) };
     client.interface.on_load_error(
         &browser,
-        frame,
+        &mut frame,
         error_code,
         unsafe { CefString::from_raw(error_text).unwrap_or(CefString::new("unknown error")) },
         unsafe {

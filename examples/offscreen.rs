@@ -1,7 +1,16 @@
 use std::{path::Path, sync::Arc, thread::sleep, time::Duration};
 
 use cef::{
-    args::Args, client::Client, life_span_handler::LifeSpanHandler, load_handler::LoadHandler, render_handler::RenderHandler, render_utils::{CefRect, PaintElementType}, string::CefString, thread::{currently_on, post_task, Task, ThreadId}, App, Browser, BrowserSettings, LogSeverity, Settings, WindowInfo
+    args::Args,
+    client::Client,
+    frame::Frame,
+    life_span_handler::LifeSpanHandler,
+    load_handler::LoadHandler,
+    render_handler::RenderHandler,
+    render_utils::{CefRect, PaintElementType},
+    string::CefString,
+    thread::{currently_on, post_task, Task, ThreadId},
+    App, Browser, BrowserSettings, LogSeverity, Settings, WindowInfo,
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -44,7 +53,7 @@ impl LoadHandler for DemoLoadHandler {
     fn on_load_start(
         &self,
         _browser: &Browser,
-        _frame: *mut cef_sys::cef_frame_t,
+        _frame: &mut Frame,
         _transition_type: cef::TransitionType,
     ) {
         println!(
@@ -53,12 +62,7 @@ impl LoadHandler for DemoLoadHandler {
         );
     }
 
-    fn on_load_end(
-        &self,
-        browser: &Browser,
-        _frame: *mut cef_sys::cef_frame_t,
-        _http_status_code: i32,
-    ) {
+    fn on_load_end(&self, browser: &Browser, _frame: &mut Frame, _http_status_code: i32) {
         println!(
             "on_load_end: _browser {:?}, _http_status_code: {:?}",
             browser, _http_status_code
@@ -73,7 +77,7 @@ impl LoadHandler for DemoLoadHandler {
     fn on_load_error(
         &self,
         _browser: &Browser,
-        _frame: *mut cef_sys::cef_frame_t,
+        _frame: &mut Frame,
         _error_code: cef::ErrorCode,
         _error_text: CefString,
         _failed_url: CefString,

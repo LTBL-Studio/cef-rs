@@ -83,6 +83,7 @@ pub mod render_utils;
 pub mod render_handler;
 pub mod load_handler;
 pub mod life_span_handler;
+pub mod frame;
 pub mod client;
 mod command_line;
 mod panel;
