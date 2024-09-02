@@ -18,6 +18,8 @@ struct Application;
 
 impl App for Application {
     type RenderProcessHandler = ();
+
+    type BrowserProcessHandler = ();
 }
 #[derive(Debug)]
 struct DemoLifeSpanHandler;

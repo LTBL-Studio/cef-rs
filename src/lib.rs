@@ -87,6 +87,7 @@ pub mod process;
 pub mod v8_context;
 pub mod v8_exception;
 pub mod v8_stack_trace;
+pub mod browser_process_handler;
 pub mod render_process_handler;
 pub mod load_handler;
 pub mod life_span_handler;
@@ -111,7 +112,6 @@ pub use settings::*;
 pub use view::*;
 pub use window::*;
 
-pub type ProcessId = cef_sys::cef_process_id_t;
 pub type ErrorCode = cef_sys::cef_errorcode_t;
 pub type TransitionType = cef_sys::cef_transition_type_t;
 pub type TextInputMode = cef_sys::cef_text_input_mode_t;
