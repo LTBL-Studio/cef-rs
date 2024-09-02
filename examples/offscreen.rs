@@ -198,7 +198,7 @@ impl Task for BrowserTask {
             // webgl: State::STATE_ENABLED,
             ..Default::default()
         };
-        
+
         let client = DemoClient {
             render_handler: Arc::new(DemoRenderHandler),
             load_handler: Arc::new(DemoLoadHandler),
@@ -206,18 +206,8 @@ impl Task for BrowserTask {
         };
 
         println!("Client created");
-        // let url = CefString::new("https://www.google.com");
         let url = CefString::new("https://developer.mozilla.org/fr/docs/Web/CSS/animation");
 
-        // let browser_view = dbg!(cef::create_browser_view(
-        //     Some(client),
-        //     url,
-        //     browser_settings
-        // ));
-
-        // let delegate = DemoWindow { browser_view };
-
-        // let x = dbg!(cef::create_top_level_window(delegate));
         let window_info = WindowInfo {
             windowless_rendering_enabled: true,
             external_begin_frame_enabled: true,
@@ -230,8 +220,7 @@ impl Task for BrowserTask {
             shared_texture_enabled: true,
             ..Default::default()
         };
-        // window_info.shared_texture_enabled = true;
-        // window_info.external_begin_frame_enabled = true;
+
         println!("Try create browser");
 
         let browser = dbg!(cef::create_browser_sync(
@@ -243,14 +232,7 @@ impl Task for BrowserTask {
 
         if let Some(host) = browser.get_host() {
             loop {
-                // let task = MessageTask;
-
-                // println!("Loop");
                 cef::do_message_loop_work();
-                // host.invalidate(PaintElementType::PET_VIEW);
-                // host.send_mouse_move_event();
-                // println!("framerate: {}", host.get_windowless_frame_rate());
-                // println!("{}", host.is_render_process_unresponsive());
                 host.send_external_begin_frame();
                 sleep(Duration::from_millis(33));
             }
@@ -264,11 +246,12 @@ fn main() {
     let args = Args::new(std::env::args());
     // dbg!(&args);
     let app = Application;
+
     let settings = Settings {
         // log_severity: LogSeverity::LOGSEVERITY_VERBOSE,
         log_severity: LogSeverity::LOGSEVERITY_DEFAULT,
         windowless_rendering_enabled: true,
-        // external_message_pump: true,
+        external_message_pump: true,
         command_line_args_disabled: false,
         // multi_threaded_message_loop: true,
         // no_sandbox: true,
@@ -289,14 +272,6 @@ fn main() {
         println!("Post task");
         dbg!(post_task(ThreadId::TID_UI, task));
     }
-
-    // let window_info = WindowInfo::new();
-
-    // cef::do_message_loop_work();
-    cef::run_message_loop();
-    // dbg!(x.has_one_ref());
-
-    println!("Coucou");
 
     cef::shutdown();
 }
