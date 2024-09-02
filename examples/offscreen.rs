@@ -1,4 +1,4 @@
-use std::{path::Path, sync::Arc, thread::sleep, time::Duration};
+use std::{sync::Arc, thread::sleep, time::Duration};
 
 use cef::{
     args::Args,
@@ -18,7 +18,6 @@ struct Application;
 
 impl App for Application {
     type RenderProcessHandler = ();
-
     type BrowserProcessHandler = ();
 }
 #[derive(Debug)]
@@ -192,7 +191,7 @@ impl Client for DemoClient {
 struct BrowserTask;
 
 impl Task for BrowserTask {
-    fn execute(&self) {
+    fn execute(self) {
         let browser_settings = BrowserSettings {
             windowless_frame_rate: 60,
             // webgl: State::STATE_ENABLED,
