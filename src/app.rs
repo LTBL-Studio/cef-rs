@@ -1,26 +1,59 @@
+use std::ptr::null_mut;
+
 use cef_sys::{
-    cef_app_t, cef_command_line_t, cef_do_message_loop_work, cef_execute_process, cef_initialize, cef_quit_message_loop, cef_run_message_loop, cef_shutdown, cef_string_t
+    cef_app_t, cef_command_line_t, cef_do_message_loop_work, cef_execute_process, cef_initialize, cef_quit_message_loop, cef_render_process_handler_t, cef_run_message_loop, cef_shutdown, cef_string_t
 };
 
 use crate::{
-    args::Args, command_line::CommandLine, rc::RcImpl, settings::Settings, string::CefString,
+    args::Args, command_line::CommandLine, rc::RcImpl, render_process_handler::RenderProcessHandler, settings::Settings, string::CefString
 };
 
 /// See [cef_app_t] for more documentation.
 pub trait App: Sized {
+    type RenderProcessHandler: RenderProcessHandler;
     fn on_before_command_line_processing(
         &self,
         _process_type: Option<CefString>,
         _command_line: CommandLine,
     ) {
     }
+    
+    fn get_render_process_handler(
+        &self
+    ) -> Option<&Self::RenderProcessHandler> {
+        None
+    }
 
     fn into_raw(self) -> *mut cef_app_t {
         let mut object: cef_app_t = unsafe { std::mem::zeroed() };
 
         object.on_before_command_line_processing = Some(on_before_command_line_processing::<Self>);
+        object.get_render_process_handler = Some(get_render_process_handler::<Self>);
 
         RcImpl::new(object, self) as *mut _
+    }
+}
+
+extern "C" fn on_before_command_line_processing<I: App>(
+    this: *mut cef_app_t,
+    process_type: *const cef_string_t,
+    command_line: *mut cef_command_line_t,
+) {
+    let app: &mut RcImpl<_, I> = RcImpl::get(this);
+    let process_type = unsafe { CefString::from_raw(process_type).ok() };
+    let cmd = unsafe { CommandLine::from_raw(command_line) };
+
+    app.interface
+        .on_before_command_line_processing(process_type, cmd);
+}
+
+extern "C" fn get_render_process_handler<I: App>(this: *mut cef_app_t) -> *mut cef_render_process_handler_t {
+    let app: &mut RcImpl<_, I> = RcImpl::get(this);
+    let res = app.interface.get_render_process_handler();
+
+    match res {
+        Some(handler) => handler.get_raw(),
+        None => null_mut(),
     }
 }
 
@@ -63,17 +96,4 @@ pub fn quit_message_loop() {
 /// See [cef_shutdown] for more documentation.
 pub fn shutdown() {
     unsafe { cef_shutdown() }
-}
-
-extern "C" fn on_before_command_line_processing<I: App>(
-    this: *mut cef_app_t,
-    process_type: *const cef_string_t,
-    command_line: *mut cef_command_line_t,
-) {
-    let obj: &mut RcImpl<_, I> = RcImpl::get(this);
-    let process_type = unsafe { CefString::from_raw(process_type).ok() };
-    let cmd = unsafe { CommandLine::from_raw(command_line) };
-
-    obj.interface
-        .on_before_command_line_processing(process_type, cmd);
 }

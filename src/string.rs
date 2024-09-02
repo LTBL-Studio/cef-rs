@@ -49,11 +49,11 @@ impl CefString {
     /// Create a `CefString` from raw `cef_string_userfree_utf16_t` pointer. If the pointer is null or it fails
     /// to convert to `U16CString`, this method will returns a [CefStringError].
     pub unsafe fn from_userfree_cef(ptr: cef_string_userfree_utf16_t) -> Result<CefString, CefStringError> {
-        let res = unsafe { Self::from_raw(ptr) };
+        let res = unsafe { Self::from_raw(ptr) }?;
         unsafe {
             cef_sys::cef_string_userfree_utf16_free(ptr);
         }
-        res
+        Ok(res)
     }
 
     /// Get raw [cef_string_utf16_t] which doesn't have the ownership of the value.

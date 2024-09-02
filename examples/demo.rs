@@ -6,7 +6,9 @@ use cef::{
 #[derive(Debug, Clone, Copy)]
 struct Application;
 
-impl App for Application {}
+impl App for Application {
+    type RenderProcessHandler = ();
+}
 
 #[derive(Debug)]
 struct DemoClient;

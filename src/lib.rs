@@ -79,8 +79,15 @@ But please understand that some requests might result into not planned.
 mod app;
 pub mod args;
 mod browser;
+pub mod dom;
+pub mod values;
 pub mod render_utils;
 pub mod render_handler;
+pub mod process;
+pub mod v8_context;
+pub mod v8_exception;
+pub mod v8_stack_trace;
+pub mod render_process_handler;
 pub mod load_handler;
 pub mod life_span_handler;
 pub mod frame;
