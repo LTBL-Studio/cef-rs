@@ -112,7 +112,7 @@ extern "C" fn get_root_screen_rect<R: RenderHandler>(
     browser: *mut cef_browser_t,
     rect: *mut cef_rect_t,
 ) -> ::std::os::raw::c_int {
-    let client: &mut RcImpl<_, R> = RcImpl::get(this);
+    let client: &mut RcImpl<_, &R> = RcImpl::get(this);
     let browser = unsafe { Browser::from_raw(browser) };
 
     if let Some(res) = client.interface.get_root_screen_rect(&browser) {
@@ -134,7 +134,7 @@ extern "C" fn get_view_rect<R: RenderHandler>(
     browser: *mut cef_browser_t,
     rect: *mut cef_rect_t,
 ) {
-    let client: &mut RcImpl<_, R> = RcImpl::get(this);
+    let client: &mut RcImpl<_, &R> = RcImpl::get(this);
     let browser = unsafe { Browser::from_raw(browser) };
     let res = client.interface.get_view_rect(&browser);
     if !rect.is_null() {
@@ -154,7 +154,7 @@ extern "C" fn get_screen_point<R: RenderHandler>(
     screen_x: *mut ::std::os::raw::c_int,
     screen_y: *mut ::std::os::raw::c_int,
 ) -> ::std::os::raw::c_int {
-    let client: &mut RcImpl<_, R> = RcImpl::get(this);
+    let client: &mut RcImpl<_, &R> = RcImpl::get(this);
     let browser = unsafe { Browser::from_raw(browser) };
     let view_point = CefPoint {
         x: view_x,
@@ -178,7 +178,7 @@ extern "C" fn get_screen_info<R: RenderHandler>(
     browser: *mut cef_browser_t,
     screen_info: *mut cef_screen_info_t,
 ) -> ::std::os::raw::c_int {
-    let client: &mut RcImpl<_, R> = RcImpl::get(this);
+    let client: &mut RcImpl<_, &R> = RcImpl::get(this);
     let browser = unsafe { Browser::from_raw(browser) };
     client
         .interface
@@ -191,7 +191,7 @@ extern "C" fn on_popup_show<R: RenderHandler>(
     browser: *mut cef_browser_t,
     show: ::std::os::raw::c_int,
 ) {
-    let client: &mut RcImpl<_, R> = RcImpl::get(this);
+    let client: &mut RcImpl<_, &R> = RcImpl::get(this);
     let browser = unsafe { Browser::from_raw(browser) };
     client.interface.on_popup_show(&browser, show > 0);
 }
@@ -201,7 +201,7 @@ extern "C" fn on_popup_size<R: RenderHandler>(
     browser: *mut cef_browser_t,
     rect: *const cef_rect_t,
 ) {
-    let client: &mut RcImpl<_, R> = RcImpl::get(this);
+    let client: &mut RcImpl<_, &R> = RcImpl::get(this);
     let browser = unsafe { Browser::from_raw(browser) };
     let rect = CefRect::from_ptr(rect);
     client.interface.on_popup_size(&browser, rect);
@@ -217,7 +217,7 @@ extern "C" fn on_paint<R: RenderHandler>(
     width: ::std::os::raw::c_int,
     height: ::std::os::raw::c_int,
 ) {
-    let client: &mut RcImpl<_, R> = RcImpl::get(this);
+    let client: &mut RcImpl<_, &R> = RcImpl::get(this);
     let browser = unsafe { Browser::from_raw(browser) };
     let dirty_rects = CefRect::from_array(dirty_rects_count, dirty_rects);
     let bytes =
@@ -236,7 +236,7 @@ extern "C" fn on_accelerated_paint<R: RenderHandler>(
     dirty_rects: *const cef_rect_t,
     info: *const cef_accelerated_paint_info_t,
 ) {
-    let client: &mut RcImpl<_, R> = RcImpl::get(this);
+    let client: &mut RcImpl<_, &R> = RcImpl::get(this);
     let browser = unsafe { Browser::from_raw(browser) };
     let dirty_rects = CefRect::from_array(dirty_rects_count, dirty_rects);
     let info = CefAcceleratedPaintInfo::from_ptr(info);
@@ -263,7 +263,7 @@ extern "C" fn update_drag_cursor<R: RenderHandler>(
     browser: *mut cef_browser_t,
     operation: cef_drag_operations_mask_t,
 ) {
-    let client: &mut RcImpl<_, R> = RcImpl::get(this);
+    let client: &mut RcImpl<_, &R> = RcImpl::get(this);
     let browser = unsafe { Browser::from_raw(browser) };
     let operation = DragOperationsMask::from(operation);
 
@@ -276,7 +276,7 @@ extern "C" fn on_scroll_offset_changed<R: RenderHandler>(
     x: f64,
     y: f64,
 ) {
-    let client: &mut RcImpl<_, R> = RcImpl::get(this);
+    let client: &mut RcImpl<_, &R> = RcImpl::get(this);
     let browser = unsafe { Browser::from_raw(browser) };
 
     client.interface.on_scroll_offset_changed(&browser, x, y);
@@ -289,7 +289,7 @@ extern "C" fn on_ime_composition_range_changed<R: RenderHandler>(
     character_bounds_count: usize,
     character_bounds: *const cef_rect_t,
 ) {
-    let client: &mut RcImpl<_, R> = RcImpl::get(this);
+    let client: &mut RcImpl<_, &R> = RcImpl::get(this);
     let browser = unsafe { Browser::from_raw(browser) };
     let selected_range = CefRange::from_ptr(selected_range);
     let character_bounds = CefRect::from_array(character_bounds_count, character_bounds);
@@ -305,7 +305,7 @@ extern "C" fn on_text_selection_changed<R: RenderHandler>(
     selected_text: *const cef_string_t,
     selected_range: *const cef_range_t,
 ) {
-    let client: &mut RcImpl<_, R> = RcImpl::get(this);
+    let client: &mut RcImpl<_, &R> = RcImpl::get(this);
     let browser = unsafe { Browser::from_raw(browser) };
     let selected_text =
         unsafe { CefString::from_raw(selected_text).expect("Error executing CefString::from_raw") };
@@ -321,7 +321,7 @@ extern "C" fn on_virtual_keyboard_requested<R: RenderHandler>(
     browser: *mut cef_browser_t,
     input_mode: cef_text_input_mode_t,
 ) {
-    let client: &mut RcImpl<_, R> = RcImpl::get(this);
+    let client: &mut RcImpl<_, &R> = RcImpl::get(this);
     let browser = unsafe { Browser::from_raw(browser) };
     client
         .interface

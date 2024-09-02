@@ -25,16 +25,16 @@ impl App for Application {
 struct DemoLifeSpanHandler;
 
 impl LifeSpanHandler for DemoLifeSpanHandler {
-    fn on_after_created(&self, _browser: &Browser) {
+    fn on_after_created(&self, _browser: Browser) {
         println!("on_after_created");
     }
 
-    fn do_close(&self, _browser: &Browser) -> bool {
+    fn do_close(&self, _browser: Browser) -> bool {
         println!("do_close");
         false
     }
 
-    fn on_before_close(&self, _browser: &Browser) {
+    fn on_before_close(&self, _browser: Browser) {
         println!("on_before_close");
     }
 }

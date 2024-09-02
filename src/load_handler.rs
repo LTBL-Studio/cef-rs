@@ -81,7 +81,7 @@ extern "C" fn on_loading_state_change<L: LoadHandler>(
     can_go_back: ::std::os::raw::c_int,
     can_go_forward: ::std::os::raw::c_int,
 ) {
-    let client: &mut RcImpl<_, L> = RcImpl::get(this);
+    let client: &mut RcImpl<_, &L> = RcImpl::get(this);
     let browser = unsafe { Browser::from_raw(browser) };
     client.interface.on_loading_state_change(
         &browser,
@@ -97,7 +97,7 @@ extern "C" fn on_load_start<L: LoadHandler>(
     frame: *mut cef_frame_t,
     transition_type: cef_transition_type_t,
 ) {
-    let client: &mut RcImpl<_, L> = RcImpl::get(this);
+    let client: &mut RcImpl<_, &L> = RcImpl::get(this);
     let browser = unsafe { Browser::from_raw(browser) };
     let mut frame = unsafe { Frame::from_raw(frame) };
     client
@@ -111,7 +111,7 @@ extern "C" fn on_load_end<L: LoadHandler>(
     frame: *mut cef_frame_t,
     http_status_code: i32,
 ) {
-    let client: &mut RcImpl<_, L> = RcImpl::get(this);
+    let client: &mut RcImpl<_, &L> = RcImpl::get(this);
     let browser = unsafe { Browser::from_raw(browser) };
     let mut frame = unsafe { Frame::from_raw(frame) };
     client
@@ -127,7 +127,7 @@ extern "C" fn on_load_error<L: LoadHandler>(
     error_text: *const cef_string_t,
     failed_url: *const cef_string_t,
 ) {
-    let client: &mut RcImpl<_, L> = RcImpl::get(this);
+    let client: &mut RcImpl<_, &L> = RcImpl::get(this);
     let browser = unsafe { Browser::from_raw(browser) };
     let mut frame = unsafe { Frame::from_raw(frame) };
     client.interface.on_load_error(
