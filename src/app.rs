@@ -80,6 +80,11 @@ extern "C" fn get_browser_process_handler<I: App>(
     }
 }
 
+impl App for () {
+    type RenderProcessHandler = ();
+    type BrowserProcessHandler = ();
+}
+
 /// See [cef_execute_process] for more documentation.
 pub fn execute_process<T: App>(args: &Args, app: Option<&T>) -> i32 {
     let args = args.to_raw();
