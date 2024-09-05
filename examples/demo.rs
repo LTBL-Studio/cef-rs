@@ -49,8 +49,8 @@ fn main() {
     // dbg!(&args);
     let app = Application;
     let settings = Settings::default();
-    dbg!(cef::initialize(&args, &settings, Some(app)));
-    dbg!(cef::execute_process(&args, Some(app)));
+    dbg!(cef::execute_process(&args, Some(&app)));
+    dbg!(cef::initialize(&args, &settings, Some(&app))).unwrap();
 
     // let window_info = WindowInfo::new();
     let browser_settings = BrowserSettings::default();

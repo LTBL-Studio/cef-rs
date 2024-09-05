@@ -23,20 +23,16 @@ pub trait App: Sized {
         _command_line: CommandLine,
     ) {
     }
-    
-    fn get_render_process_handler(
-        &self
-    ) -> Option<&Self::RenderProcessHandler> {
-        None
-    }
-    
-    fn get_browser_process_handler(
-        &self
-    ) -> Option<&Self::BrowserProcessHandler> {
+
+    fn get_render_process_handler(&self) -> Option<&Self::RenderProcessHandler> {
         None
     }
 
-    fn into_raw(self) -> *mut cef_app_t {
+    fn get_browser_process_handler(&self) -> Option<&Self::BrowserProcessHandler> {
+        None
+    }
+
+    fn get_raw(&self) -> *mut cef_app_t {
         let mut object: cef_app_t = unsafe { std::mem::zeroed() };
 
         object.on_before_command_line_processing = Some(on_before_command_line_processing::<Self>);
@@ -52,7 +48,7 @@ extern "C" fn on_before_command_line_processing<I: App>(
     process_type: *const cef_string_t,
     command_line: *mut cef_command_line_t,
 ) {
-    let app: &mut RcImpl<_, I> = RcImpl::get(this);
+    let app: &RcImpl<_, &I> = RcImpl::get(this);
     let process_type = unsafe { CefString::from_raw(process_type).ok() };
     let cmd = unsafe { CommandLine::from_raw(command_line) };
 
@@ -60,8 +56,10 @@ extern "C" fn on_before_command_line_processing<I: App>(
         .on_before_command_line_processing(process_type, cmd);
 }
 
-extern "C" fn get_render_process_handler<I: App>(this: *mut cef_app_t) -> *mut cef_render_process_handler_t {
-    let app: &mut RcImpl<_, I> = RcImpl::get(this);
+extern "C" fn get_render_process_handler<I: App>(
+    this: *mut cef_app_t,
+) -> *mut cef_render_process_handler_t {
+    let app: &RcImpl<_, &I> = RcImpl::get(this);
     let res = app.interface.get_render_process_handler();
 
     match res {
@@ -70,8 +68,10 @@ extern "C" fn get_render_process_handler<I: App>(this: *mut cef_app_t) -> *mut c
     }
 }
 
-extern "C" fn get_browser_process_handler<I: App>(this: *mut cef_app_t) -> *mut cef_browser_process_handler_t {
-    let app: &mut RcImpl<_, I> = RcImpl::get(this);
+extern "C" fn get_browser_process_handler<I: App>(
+    this: *mut cef_app_t,
+) -> *mut cef_browser_process_handler_t {
+    let app: &RcImpl<_, &I> = RcImpl::get(this);
     let res = app.interface.get_browser_process_handler();
 
     match res {
@@ -81,10 +81,10 @@ extern "C" fn get_browser_process_handler<I: App>(this: *mut cef_app_t) -> *mut 
 }
 
 /// See [cef_execute_process] for more documentation.
-pub fn execute_process<T: App>(args: &Args, app: Option<T>) -> i32 {
+pub fn execute_process<T: App>(args: &Args, app: Option<&T>) -> i32 {
     let args = args.to_raw();
     let app = app
-        .map(|app| app.into_raw())
+        .map(|app| app.get_raw())
         .unwrap_or(std::ptr::null_mut());
 
     unsafe { cef_execute_process(&args, app, std::ptr::null_mut()) }
@@ -94,12 +94,12 @@ pub fn execute_process<T: App>(args: &Args, app: Option<T>) -> i32 {
 pub fn initialize<T: App>(
     args: &Args,
     settings: &Settings,
-    app: Option<T>,
+    app: Option<&T>,
 ) -> Result<(), ResultCode> {
     let args = args.to_raw();
     let settings = settings.get_raw();
     let app = app
-        .map(|app| app.into_raw())
+        .map(|app| app.get_raw())
         .unwrap_or(std::ptr::null_mut());
 
     if unsafe { cef_initialize(&args, &settings, app, std::ptr::null_mut()) } == 1 {

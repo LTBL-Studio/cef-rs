@@ -146,9 +146,6 @@ impl RenderHandler for DemoRenderHandler {
         _height: u32,
     ) {
         println!("Paint event !");
-
-        // println!("{_bytes:?}");
-        // panic!();
     }
 
     fn on_accelerated_paint(
@@ -159,7 +156,6 @@ impl RenderHandler for DemoRenderHandler {
         _info: cef::render_utils::CefAcceleratedPaintInfo,
     ) {
         println!("Accelerated paint event !");
-        // panic!();
     }
 }
 
@@ -260,8 +256,8 @@ fn main() {
         // root_cache_path: CefString::new(&Path::new("/Absolute/Path/To/cache").as_os_str().to_string_lossy()),
         ..Default::default()
     };
-    dbg!(cef::execute_process::<Application>(&args, Some(app)));
-    dbg!(cef::initialize::<Application>(&args, &settings, Some(app)));
+    dbg!(cef::execute_process(&args, Some(&app)));
+    dbg!(cef::initialize(&args, &settings, Some(&app))).unwrap();
 
     let task = BrowserTask;
     if currently_on(ThreadId::TID_UI) {
