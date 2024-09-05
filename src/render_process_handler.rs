@@ -25,7 +25,6 @@ pub trait RenderProcessHandler: Sized {
     fn on_browser_created(&self, _browser: Browser, _extra_info: DictionaryValue) {}
     fn on_browser_destroyed(&self, _browser: Browser) {}
     fn get_load_handler(&self) -> Option<&Self::LoadHandler> {
-        panic!();
         None
     }
     fn on_context_created(&self, _browser: Browser, _frame: Frame, _context: V8Context) {}
@@ -103,7 +102,6 @@ extern "C" fn on_browser_destroyed<R: RenderProcessHandler>(
 extern "C" fn get_load_handler<R: RenderProcessHandler>(
     this: *mut cef_render_process_handler_t,
 ) -> *mut cef_load_handler_t {
-    panic!();
     let handler: &mut RcImpl<_, &R> = RcImpl::get(this);
     let res = handler.interface.get_load_handler();
 
