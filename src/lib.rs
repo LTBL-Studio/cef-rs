@@ -76,6 +76,7 @@ But please understand that some requests might result into not planned.
 - Provide tools to bundle and distribute application.
 */
 
+pub(crate) mod utils;
 mod app;
 pub mod args;
 mod browser;
@@ -112,6 +113,7 @@ pub use settings::*;
 pub use view::*;
 pub use window::*;
 
+pub type ResultCode = cef_sys::cef_resultcode_t;
 pub type ErrorCode = cef_sys::cef_errorcode_t;
 pub type TransitionType = cef_sys::cef_transition_type_t;
 pub type TextInputMode = cef_sys::cef_text_input_mode_t;

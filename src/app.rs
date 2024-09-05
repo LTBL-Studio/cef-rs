@@ -1,11 +1,15 @@
 use std::ptr::null_mut;
 
 use cef_sys::{
-    cef_app_t, cef_browser_process_handler_t, cef_command_line_t, cef_do_message_loop_work, cef_execute_process, cef_initialize, cef_quit_message_loop, cef_render_process_handler_t, cef_run_message_loop, cef_shutdown, cef_string_t
+    cef_app_t, cef_browser_process_handler_t, cef_command_line_t, cef_do_message_loop_work,
+    cef_execute_process, cef_get_exit_code, cef_initialize, cef_quit_message_loop,
+    cef_render_process_handler_t, cef_run_message_loop, cef_shutdown, cef_string_t,
 };
 
 use crate::{
-    args::Args, browser_process_handler::BrowserProcessHandler, command_line::CommandLine, rc::RcImpl, render_process_handler::RenderProcessHandler, settings::Settings, string::CefString
+    args::Args, browser_process_handler::BrowserProcessHandler, command_line::CommandLine,
+    rc::RcImpl, render_process_handler::RenderProcessHandler, settings::Settings,
+    string::CefString, ResultCode,
 };
 
 /// See [cef_app_t] for more documentation.
@@ -87,14 +91,25 @@ pub fn execute_process<T: App>(args: &Args, app: Option<T>) -> i32 {
 }
 
 /// See [cef_initialize] for more documentation.
-pub fn initialize<T: App>(args: &Args, settings: &Settings, app: Option<T>) -> bool {
+pub fn initialize<T: App>(
+    args: &Args,
+    settings: &Settings,
+    app: Option<T>,
+) -> Result<(), ResultCode> {
     let args = args.to_raw();
     let settings = settings.get_raw();
     let app = app
         .map(|app| app.into_raw())
         .unwrap_or(std::ptr::null_mut());
 
-    unsafe { cef_initialize(&args, &settings, app, std::ptr::null_mut()) == 1 }
+    if unsafe { cef_initialize(&args, &settings, app, std::ptr::null_mut()) } == 1 {
+        Ok(())
+    } else {
+        Err(
+            crate::utils::integer_to_error_code(unsafe { cef_get_exit_code() })
+                .expect("Exit code is not a known result code"),
+        )
+    }
 }
 
 /// See [cef_run_message_loop] for more documentation.
