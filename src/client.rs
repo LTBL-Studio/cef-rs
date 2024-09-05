@@ -10,7 +10,7 @@ pub trait Client: Sized {
     type LoadHandler: LoadHandler;
     type LifeSpanHandler: LifeSpanHandler;
 
-    fn get_render_handler(&self) -> Option<Arc<Self::RenderHandler>> {
+    fn get_render_handler(&self) -> Option<&Self::RenderHandler> {
         None
     }
 
@@ -18,7 +18,7 @@ pub trait Client: Sized {
         None
     }
 
-    fn get_life_span_handler(&self) -> Option<Arc<Self::LifeSpanHandler>> {
+    fn get_life_span_handler(&self) -> Option<&Self::LifeSpanHandler> {
         None
     }
 

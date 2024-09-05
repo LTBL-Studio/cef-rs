@@ -161,9 +161,9 @@ impl RenderHandler for DemoRenderHandler {
 
 #[derive(Debug)]
 struct DemoClient {
-    render_handler: Arc<DemoRenderHandler>,
+    render_handler: DemoRenderHandler,
     load_handler: Arc<DemoLoadHandler>,
-    life_span_handler: Arc<DemoLifeSpanHandler>,
+    life_span_handler: DemoLifeSpanHandler,
 }
 
 impl Client for DemoClient {
@@ -171,16 +171,16 @@ impl Client for DemoClient {
     type LoadHandler = DemoLoadHandler;
     type LifeSpanHandler = DemoLifeSpanHandler;
 
-    fn get_render_handler(&self) -> Option<Arc<DemoRenderHandler>> {
-        Some(self.render_handler.clone())
+    fn get_render_handler(&self) -> Option<&DemoRenderHandler> {
+        Some(&self.render_handler)
     }
 
     fn get_load_handler(&self) -> Option<Arc<DemoLoadHandler>> {
         Some(self.load_handler.clone())
     }
 
-    fn get_life_span_handler(&self) -> Option<Arc<DemoLifeSpanHandler>> {
-        Some(self.life_span_handler.clone())
+    fn get_life_span_handler(&self) -> Option<&DemoLifeSpanHandler> {
+        Some(&self.life_span_handler)
     }
 }
 
@@ -195,9 +195,9 @@ impl Task for BrowserTask {
         };
 
         let client = DemoClient {
-            render_handler: Arc::new(DemoRenderHandler),
+            render_handler: DemoRenderHandler,
             load_handler: Arc::new(DemoLoadHandler),
-            life_span_handler: Arc::new(DemoLifeSpanHandler),
+            life_span_handler: DemoLifeSpanHandler,
         };
 
         println!("Client created");
