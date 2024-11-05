@@ -1,6 +1,6 @@
 use cef_sys::cef_frame_t;
 
-use crate::wrapper;
+use crate::{string::CefString, wrapper};
 
 wrapper!(
     #[doc = "See [cef_frame_t] for more documentation."]
@@ -15,3 +15,11 @@ wrapper!(
     pub fn select_all(&self);
     pub fn view_source(&self);
 );
+
+impl Frame {
+    pub fn load_url(&self, url: CefString) {
+        if let Some(f) = self.0.load_url {
+            unsafe { f(self.0.get_raw(), &url.get_raw()) };
+        }
+    }
+}
