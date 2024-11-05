@@ -178,6 +178,17 @@ wrapper!(
 );
 
 impl BrowserHost {
+    pub fn get_browser(&self) -> Option<Browser> {
+        self.0.get_browser.and_then(|f| {
+            let p = unsafe { f(self.0.get_raw()) };
+            if p.is_null() {
+                None
+            } else {
+                Some(unsafe { Browser::from_raw(p) })
+            }
+        })
+    }
+    
     pub fn set_focus(&self, focus: bool) {
         if let Some(f) = self.0.set_focus {
             unsafe { f(self.0.get_raw(), focus.into()) };
