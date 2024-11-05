@@ -6,7 +6,7 @@ use cef_sys::{
 };
 
 use crate::{
-    client::Client, render_utils::PaintElementType, string::CefString, window::WindowInfo, wrapper, State, View
+    client::Client, frame::Frame, render_utils::PaintElementType, string::CefString, window::WindowInfo, wrapper, State, View
 };
 
 /// See [cef_browser_settings_t] for more documentation.
@@ -247,6 +247,17 @@ impl Browser {
                 None
             } else {
                 Some(unsafe { BrowserHost::from_raw(p) })
+            }
+        })
+    }
+
+    pub fn get_main_frame(&self) -> Option<Frame> {
+        self.0.get_main_frame.and_then(|f| {
+            let p = unsafe { f(self.0.get_raw()) };
+            if p.is_null() {
+                None
+            } else {
+                Some(unsafe { Frame::from_raw(p) })
             }
         })
     }
