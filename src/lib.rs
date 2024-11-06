@@ -98,6 +98,7 @@ mod command_line;
 mod panel;
 pub mod rc;
 pub mod thread;
+pub mod task_runner;
 mod settings;
 pub mod string;
 mod view;

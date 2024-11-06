@@ -1,6 +1,10 @@
-use cef_sys::{cef_currently_on, cef_post_task, cef_task_t, cef_thread_id_t};
+use std::time::Duration;
 
-use crate::rc::RcImpl;
+use cef_sys::{
+    cef_currently_on, cef_post_delayed_task, cef_post_task, cef_task_runner_get_for_current_thread, cef_task_runner_get_for_thread, cef_task_t, cef_thread_id_t
+};
+
+use crate::{rc::RcImpl, task_runner::TaskRunner};
 
 pub type ThreadId = cef_thread_id_t;
 
@@ -25,6 +29,21 @@ pub fn currently_on(thread_id: ThreadId) -> bool {
 /// See [cef_post_task] for more documentation.
 pub fn post_task(thread_id: ThreadId, task: impl Task) -> bool {
     unsafe { cef_post_task(thread_id, task.into_raw()) > 0 }
+}
+
+/// See [cef_post_delayed_task] for more documentation.
+pub fn post_delayed_task(thread_id: ThreadId, task: impl Task, delay: Duration) -> bool {
+    unsafe { cef_post_delayed_task(thread_id, task.into_raw(), delay.as_millis() as i64) > 0 }
+}
+
+/// See [cef_task_runner_get_for_current_thread] for more documentation.
+pub fn task_runner_get_for_current_thread() -> TaskRunner {
+    unsafe { TaskRunner::from_raw(cef_task_runner_get_for_current_thread()) }
+}
+
+/// See [cef_task_runner_get_for_thread] for more documentation.
+pub fn task_runner_get_for_thread(thread_id: ThreadId) -> TaskRunner {
+    unsafe { TaskRunner::from_raw(cef_task_runner_get_for_thread(thread_id)) }
 }
 
 extern "C" fn execute<T: Task>(this: *mut cef_task_t) {
