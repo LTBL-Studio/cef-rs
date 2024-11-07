@@ -14,7 +14,7 @@ pub trait Client: Sized {
         None
     }
 
-    fn get_load_handler(&self) -> Option<Arc<Self::LoadHandler>> {
+    fn get_load_handler(&self) -> Option<&Self::LoadHandler> {
         None
     }
 
