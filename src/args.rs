@@ -24,7 +24,7 @@ impl Args {
     pub fn to_raw(&self) -> cef_main_args_t {
         cef_main_args_t {
             argc: self.argv.len() as i32,
-            argv: self.argv.as_ptr() as *mut *mut _,
+            argv: if self.argv.is_empty() {std::ptr::null()} else {self.argv.as_ptr()} as *mut *mut _,
         }
     }
 }
