@@ -86,8 +86,8 @@ impl App for () {
 }
 
 /// See [cef_execute_process] for more documentation.
-pub fn execute_process<T: App>(args: &Args, app: Option<&T>) -> i32 {
-    let args = args.to_raw();
+pub fn execute_process<T: App>(args: Option<&Args>, app: Option<&T>) -> i32 {
+    let args = args.unwrap_or(&Args::default()).to_raw();
     let app = app
         .map(|app| app.get_raw())
         .unwrap_or(std::ptr::null_mut());
@@ -97,11 +97,11 @@ pub fn execute_process<T: App>(args: &Args, app: Option<&T>) -> i32 {
 
 /// See [cef_initialize] for more documentation.
 pub fn initialize<T: App>(
-    args: &Args,
+    args: Option<&Args>,
     settings: &Settings,
     app: Option<&T>,
 ) -> Result<(), ResultCode> {
-    let args = args.to_raw();
+    let args = args.unwrap_or(&Args::default()).to_raw();
     let settings = settings.get_raw();
     let app = app
         .map(|app| app.get_raw())
