@@ -4,14 +4,20 @@ set -e
 
 LIBDIR="/usr/lib"
 OUTDIR="$LIBDIR/cef"
-mkdir -p $OUTDIR
-
-DL_DIR="./target/cef_download"
-mkdir -p "$DL_DIR"
+sudo mkdir -p $OUTDIR
 
 if [ -z ${1} ]; then
     echo "CEF version is not provided";
     exit 1;
+fi
+
+DL_DIR=$(find /tmp/ -maxdepth 1 -type d -name "cef_download*" -print -quit)
+
+if [ -z ${DL_DIR} ]; then
+    DL_DIR=$(mktemp -d cef_download.XXXXXXXXXX -t)
+    echo $DL_DIR
+else
+    echo $DL_DIR
 fi
 
 echo "Searching CEF $1 binaries..."
@@ -45,5 +51,6 @@ sudo cp -r -f "./Resources/." $OUTDIR
 
 echo "Creating symbolic links to /usr/lib..."
 
-sudo ln -f -s $OUTDIR/*.so $LIBDIR
-sudo ln -f -s $OUTDIR/*.bin $LIBDIR
+sudo ln -f -s $OUTDIR/* $LIBDIR
+
+echo "CEF successfully installed"
