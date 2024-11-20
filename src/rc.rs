@@ -60,7 +60,7 @@ pub trait Rc {
     }
 
     /// Decrease reference count by 1 and release the value if the count meets 0.
-    /// Reuturn `True` if it is released.
+    /// Return `True` if it is released.
     unsafe fn release(&self) -> bool {
         self.as_base().release()
     }
@@ -125,10 +125,10 @@ macro_rules! gen_fn {
         $visibility fn $method(&self $(,$a: $t)*) $(-> $value)? {
             unsafe {
                 let _result = self.0.$method.map(|f|
-                    f(self.0.get_raw() $(,crate::gen_fn!($c $arg))*)
+                    f(self.0.get_raw() $(,$crate::gen_fn!($c $arg))*)
                 );
 
-                $(crate::gen_fn!(return $($n)? _result))?
+                $($crate::gen_fn!(return $($n)? _result))?
             }
         }
     };

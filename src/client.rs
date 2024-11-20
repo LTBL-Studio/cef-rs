@@ -1,4 +1,4 @@
-use std::{ptr::null_mut, sync::Arc};
+use std::ptr::null_mut;
 
 use cef_sys::{cef_browser_t, cef_client_t, cef_frame_t, cef_life_span_handler_t, cef_load_handler_t, cef_process_id_t, cef_process_message_t, cef_render_handler_t};
 
