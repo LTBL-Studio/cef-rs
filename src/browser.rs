@@ -6,7 +6,7 @@ use cef_sys::{
 };
 
 use crate::{
-    client::Client, frame::Frame, render_utils::PaintElementType, string::CefString, window::WindowInfo, wrapper, State, View
+    client::Client, frame::Frame, rc::RcImpl, render_utils::PaintElementType, string::CefString, window::WindowInfo, wrapper, State, View
 };
 
 /// See [cef_browser_settings_t] for more documentation.
@@ -76,10 +76,6 @@ impl Default for BrowserSettings {
 }
 
 impl BrowserSettings {
-    pub(crate) fn from_mut_ptr(raw: *mut cef_browser_settings_t) -> Self {
-        Self::from(unsafe { &*raw })
-    }
-
     pub fn into_raw(self) -> cef_browser_settings_t {
         cef_browser_settings_t {
             size: std::mem::size_of::<cef_browser_settings_t>(),
@@ -178,6 +174,17 @@ wrapper!(
 );
 
 impl BrowserHost {
+    pub fn get_client<'a, C: Client>(&self) -> Option<&'a mut C> {
+        self.0.get_client.and_then(|f| {
+            let p = unsafe { f(self.0.get_raw()) };
+            if p.is_null() {
+                None
+            } else {
+                Some(&mut RcImpl::get(p).interface)
+            }
+        })
+    }
+
     pub fn get_browser(&self) -> Option<Browser> {
         self.0.get_browser.and_then(|f| {
             let p = unsafe { f(self.0.get_raw()) };
