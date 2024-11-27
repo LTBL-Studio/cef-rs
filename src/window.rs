@@ -67,11 +67,11 @@ impl From<&cef_window_info_t> for WindowInfo {
         WindowInfo {
             window_name: raw.window_name.try_into().expect("Issue converting window_name string"),
             bounds: raw.bounds.into(),
-            parent_window: raw.parent_window,
+            parent_window: raw.parent_window.into(),
             windowless_rendering_enabled: raw.windowless_rendering_enabled > 0,
             shared_texture_enabled: raw.shared_texture_enabled > 0,
             external_begin_frame_enabled: raw.external_begin_frame_enabled > 0,
-            window: raw.window,
+            window: raw.window.into(),
         }
     }
 }

@@ -3,7 +3,7 @@ fn main() {
     #[cfg(target_os = "windows")]
     let path = match std::env::var("CEF_PATH") {
         Ok(val) => val,
-        Err(_) => panic!("Couldn't get the path of shared library: {e}"),
+        Err(_) => panic!("Couldn't get the path of shared library"),
     };
 
     #[cfg(not(target_os = "windows"))]
